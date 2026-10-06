@@ -22,6 +22,7 @@ public class Conexao {
           System.out.println("Conectado com o banco 100%");
           } catch(SQLException erro){
           System.out.println("Erro ao conectar");
+          System.out.println(erro.getMessage());
           }
           return conexao;
     }
