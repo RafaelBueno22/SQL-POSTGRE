@@ -13,4 +13,18 @@ CREATE TABLE servico_zoo (
 	CONSTRAINT chk_descricao_servico CHECK (LENGTH(TRIM(descricao)) >0 )
 )
 
-SELECT * FROM servico_zoo
+
+CREATE TABLE zelador(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(100) NOT NULL,
+	especialidade VARCHAR(100) NOT NULL,
+	telefone VARCHAR(14) NOT NULL UNIQUE,
+	email VARCHAR(100) NOT NULL UNIQUE
+)
+
+
+CREATE TABLE animal(
+   id SERIAL PRIMARY KEY,
+	especie VARCHAR(100) NOT NULL,
+	nome VARCHAR(100) NOT NULL
+)
