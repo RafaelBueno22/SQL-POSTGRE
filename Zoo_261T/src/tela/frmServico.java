@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import javax.swing.table.DefaultTableModel;
 
 
 /**
@@ -17,15 +18,52 @@ import java.time.format.DateTimeFormatter;
 public class frmServico extends javax.swing.JFrame {
 
     private void limparCampos(){
-        txtIdServico
+        
     }
     
+    
+    private void atualizarTabela(){
+    
+         DefaultTableModel modelo = (DefaultTableModel) tblServicos.getModel();
+         modelo.setRowCount(0);
+         
+         String sql = "SELECT s.id, s.animal_id, a.nome AS animal_nome, "
+                     +"s.zelador_id, z.nome AS zelador_nome,"
+                     +"s.descricao, s.data_execucao, s.executado "
+                     +"FROM servico_zoo s "
+                     +"INNER JOIN animal a ON a.id = s.animal_id "
+                     +"INNER JOIN zelador z ON z.id = s.zelador_id "
+                     +"ORDER BY s.id";
+         
+         try(Connection conex = Conexao.conectar();
+             PreparedStatement stmt = conex.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()
+                 ){
+             while (rs.next()) {
+                 modelo.addRow( new Object[]{
+                      rs.getInt("id"),
+                      rs.getInt("animal_id"),
+                      rs.getString("animal_nome"),
+                      rs.getInt("zelador_id"),
+                      rs.getString("zelador_nome"),
+                      rs.getString("descricao"),
+                      rs.getDate("data_execucao"),
+                      rs.getBoolean("executado")
+                 });
+             
+             }
+         }catch(SQLException erro){
+             JOptionPane.showMessageDialog(this, "Erro ao carregar serviços " +erro.getMessage());
+         }
+                 
+    }
     
     
     public frmServico() {
         initComponents();
         txtDataExecucao.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         chkExecutado.setSelected(false);
+        atualizarTabela();
        
         
         
@@ -37,7 +75,7 @@ public class frmServico extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblServicos = new javax.swing.JTable();
         btnSalvar = new javax.swing.JButton();
         btnAlterar = new javax.swing.JButton();
         btnExcluir = new javax.swing.JButton();
@@ -63,18 +101,18 @@ public class frmServico extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblServicos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Serviço N°", "ID Animal", "Nome Animal", "ID Zelador", "Nome Zelador", "Descrição do Serviço", "Data do Serviço", "Executado?"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblServicos);
 
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
@@ -90,6 +128,11 @@ public class frmServico extends javax.swing.JFrame {
         btnConcluirServico.setText("Concluir Servico");
 
         btnAtualizar.setText("Atualizar");
+        btnAtualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAtualizarActionPerformed(evt);
+            }
+        });
 
         btnLimparCampos.setText("Limpar Campos");
 
@@ -361,7 +404,13 @@ public class frmServico extends javax.swing.JFrame {
       }catch(SQLException erro) {
           JOptionPane.showMessageDialog(this, "Erro ao cadastrar Serviço: " +erro.getMessage());
       } 
+      
+      atualizarTabela();
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtualizarActionPerformed
+        atualizarTabela();
+    }//GEN-LAST:event_btnAtualizarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -415,7 +464,7 @@ public class frmServico extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblServicos;
     private javax.swing.JFormattedTextField txtDataExecucao;
     private javax.swing.JTextArea txtDescricao;
     private javax.swing.JTextField txtIdAnimal;
